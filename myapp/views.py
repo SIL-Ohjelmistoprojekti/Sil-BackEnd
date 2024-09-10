@@ -4,17 +4,18 @@ from django.conf import settings
 
 def index(request):
     return HttpResponse("Tervetuloa sovelluksen etusivulle!")
-
+#python manage.py runserver
+#http://127.0.0.1:8000/weather
 def weather_data_view(request):
     file_path = os.path.join(settings.BASE_DIR, 'w.txt')
     
     with open(file_path, 'r') as file:
         data = file.read()
 
-    # Jaa tiedot riveittäin
+    # datan jako osiksi
     lines = data.split('\n')
 
-    # Luo sanakirja tallentaaksesi tiedot
+    # tehdään termit ja muuttujattt
     weather_data = {
         'one_hour_rainfall': [],
         'twenty_four_hour_rainfall': [],
@@ -26,7 +27,7 @@ def weather_data_view(request):
         'max_wind_speed': []
     }
 
-    # Käy läpi rivit ja tallenna tiedot sanakirjaan
+    # käydää jaetut osat läpi ja lisätään ne muuttujiin
     for line in lines:
         if 'One Hour' in line:
             weather_data['one_hour_rainfall'].append(line.split(': ')[1])
@@ -45,7 +46,7 @@ def weather_data_view(request):
         elif 'Max Wind Speed (Five Minutes)' in line:
             weather_data['max_wind_speed'].append(line.split(': ')[1])
 
-    # Luo HTML-rakenne tiedoille
+    # jotta saadaan tohon nettisivuun niin ilmeisesti html rakennetta pitää olla. tehdään myös riveittäi
     html_response = "<h2>Weather Data</h2><ul>"
     
     for key, values in weather_data.items():
