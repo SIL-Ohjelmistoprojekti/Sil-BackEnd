@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import os
 from django.conf import settings
 
@@ -12,10 +12,10 @@ def weather_data_view(request):
     with open(file_path, 'r') as file:
         data = file.read()
 
-    # datan jako osiksi
+    # Datan jako palasiksi
     lines = data.split('\n')
 
-    # tehdään termit ja muuttujattt
+    # Tehdään termit ja muuttujattt
     weather_data = {
         'one_hour_rainfall': [],
         'twenty_four_hour_rainfall': [],
@@ -27,7 +27,7 @@ def weather_data_view(request):
         'max_wind_speed': []
     }
 
-    # käydää jaetut osat läpi ja lisätään ne muuttujiin
+    # Käydään jaetut osat läpi ja lisätään ne muuttujiin
     for line in lines:
         if 'One Hour' in line:
             weather_data['one_hour_rainfall'].append(line.split(': ')[1])
@@ -46,7 +46,7 @@ def weather_data_view(request):
         elif 'Max Wind Speed (Five Minutes)' in line:
             weather_data['max_wind_speed'].append(line.split(': ')[1])
 
-    # jotta saadaan tohon nettisivuun niin ilmeisesti html rakennetta pitää olla. tehdään myös riveittäi
+    # HTML-vastailun käsittely. Sekä strong class että selkeempi näkyvyys
     html_response = "<h2>Weather Data</h2><ul>"
     
     for key, values in weather_data.items():
@@ -56,4 +56,11 @@ def weather_data_view(request):
     
     html_response += "</ul>"
 
-    return HttpResponse(html_response)
+    # Tsekkaillaan URLI
+    #http://127.0.0.1:8000/weather/?muoto=html
+    response_format = request.GET.get('muoto', 'html')
+#http://127.0.0.1:8000/weather/?muoto=json
+    if response_format == 'json':
+        return JsonResponse(weather_data)
+    else:
+        return HttpResponse(html_response)#
