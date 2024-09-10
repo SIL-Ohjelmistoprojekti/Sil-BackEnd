@@ -3,7 +3,11 @@ import os
 from django.conf import settings
 
 def index(request):
-    return HttpResponse("Tervetuloa sovelluksen etusivulle!")
+    html_response = """
+        <h1>Welcome to the frontpage!</h1>
+        <p><a href='/weather'>View weatherdata</a></p>
+    """
+    return HttpResponse(html_response)
 #python manage.py runserver
 #http://127.0.0.1:8000/weather
 def weather_data_view(request):
@@ -55,5 +59,7 @@ def weather_data_view(request):
             html_response += f"<li>{value}</li>"
     
     html_response += "</ul>"
+
+    html_response += "<p><a href='/'>Back to the frontpage</a></p>"
 
     return HttpResponse(html_response)
