@@ -1,21 +1,22 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 import os
 from django.conf import settings
 
-def index(request):
-    return HttpResponse("Tervetuloa sovelluksen etusivulle!")
-#python manage.py runserver
-#http://127.0.0.1:8000/weather
-def weather_data_view(request):
+
+    
+
+def weather_data_api(request):
+    # Path to the weather data file
     file_path = os.path.join(settings.BASE_DIR, 'w.txt')
     
+    # Read the file contents
     with open(file_path, 'r') as file:
         data = file.read()
 
-    # datan jako osiksi
+    # Split the data into lines
     lines = data.split('\n')
 
-    # tehdään termit ja muuttujattt
+    # Initialize a dictionary to hold the weather data
     weather_data = {
         'one_hour_rainfall': [],
         'twenty_four_hour_rainfall': [],
@@ -27,7 +28,7 @@ def weather_data_view(request):
         'max_wind_speed': []
     }
 
-    # käydää jaetut osat läpi ja lisätään ne muuttujiin
+    # Process each line and append relevant data to the dictionary
     for line in lines:
         if 'One Hour' in line:
             weather_data['one_hour_rainfall'].append(line.split(': ')[1])
@@ -46,14 +47,5 @@ def weather_data_view(request):
         elif 'Max Wind Speed (Five Minutes)' in line:
             weather_data['max_wind_speed'].append(line.split(': ')[1])
 
-    # jotta saadaan tohon nettisivuun niin ilmeisesti html rakennetta pitää olla. tehdään myös riveittäi
-    html_response = "<h2>Weather Data</h2><ul>"
-    
-    for key, values in weather_data.items():
-        html_response += f"<li><strong>{key.replace('_', ' ').title()}:</strong></li>"
-        for value in values:
-            html_response += f"<li>{value}</li>"
-    
-    html_response += "</ul>"
-
-    return HttpResponse(html_response)
+    # Return the weather data as a JSON response
+    return JsonResponse(weather_data)
