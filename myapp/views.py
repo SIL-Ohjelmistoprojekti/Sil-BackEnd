@@ -85,15 +85,20 @@ def metar(request):
         return JsonResponse(data)
     else:
         # Luo HTML-vastaus
+        metar_data = data['data'][0]
         html_response = f"""
         <html>
         <body>
-            <h1>METAR Data for {data['data'][0]['station']['name']}</h1>
-            <p>Temperature: {data['data'][0]['temperature']['celsius']}°C</p>
-            <p>Humidity: {data['data'][0]['humidity']['percent']}%</p>
-            <p>Wind: {data['data'][0]['wind']['speed_kph']} kph</p>
-            <p>Visibility: {data['data'][0]['visibility']['meters']} meters</p>
-            <p>Clouds: {data['data'][0]['clouds'][0]['text']} at {data['data'][0]['clouds'][0]['base_feet_agl']} feet</p>
+            <h1>METAR Data for {metar_data['station']['name']}</h1>
+            <p>Raw METAR: {metar_data['raw_text']}</p>
+            <p>Temperature: {metar_data['temperature']['celsius']}°C</p>
+            <p>Humidity: {metar_data['humidity']['percent']}%</p>
+            <p>Wind: {metar_data['wind']['speed_kph']} kph</p>
+            <p>Visibility: {metar_data['visibility']['meters']} meters</p>
+            <p>Clouds: {metar_data['clouds'][0]['text']} at {metar_data['clouds'][0]['base_feet_agl']} feet</p>
+            <p>Barometer: {metar_data['barometer']['hpa']} hPa</p>
+            <p>Ceiling: {metar_data['ceiling']['feet']} feet</p>
+            <p>Observed: {metar_data['observed']}</p>
         </body>
         </html>
         """
