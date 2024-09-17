@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Data</title>
+</head>
+<body>
+    <h2>Weather Data</h2>
+    <ul>
+        {% for key, values in weather_data.items %}
+            <li><strong>{{ key|cut:"_"|title }}:</strong></li>  <!-- Removes underscores and capitalizes -->
+            {% for value in values %}
+                <li>{{ value }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+</body>
+</html>
