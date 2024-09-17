@@ -1,6 +1,16 @@
+import json
 from django.http import HttpResponse, JsonResponse
 import os
 from django.conf import settings
+from django.shortcuts import render
+import requests
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .metar import get_metar_data
+
+#laitettu pip install scrapy, pip install django djangorestframework
+
 
 def index(request):
     return HttpResponse("Tervetuloa sovelluksen etusivulle!")
@@ -64,3 +74,31 @@ def weather_data_view(request):
         return JsonResponse(weather_data)
     else:
         return HttpResponse(html_response)#
+    
+
+@api_view(['GET'])
+def metar(request):
+    data = get_metar_data()
+    response_format = request.GET.get('muoto', 'html')
+    
+    if response_format == 'json':
+        return JsonResponse(data)
+    else:
+        # Luo HTML-vastaus
+        html_response = f"""
+        <html>
+        <body>
+            <h1>METAR Data for {data['data'][0]['station']['name']}</h1>
+            <p>Temperature: {data['data'][0]['temperature']['celsius']}°C</p>
+            <p>Humidity: {data['data'][0]['humidity']['percent']}%</p>
+            <p>Wind: {data['data'][0]['wind']['speed_kph']} kph</p>
+            <p>Visibility: {data['data'][0]['visibility']['meters']} meters</p>
+            <p>Clouds: {data['data'][0]['clouds'][0]['text']} at {data['data'][0]['clouds'][0]['base_feet_agl']} feet</p>
+        </body>
+        </html>
+        """
+        return HttpResponse(html_response)
+    #http://127.0.0.1:8000/metar/
+    #http://127.0.0.1:8000/metar/?muoto=html
+    #http://127.0.0.1:8000/metar/?muoto=json¨
+    

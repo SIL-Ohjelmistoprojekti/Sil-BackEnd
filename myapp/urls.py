@@ -3,5 +3,11 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),  
-    path('weather/', views.weather_data_view, name='weather_data'),  
+    path('weather/', views.weather_data_view, name='weather_data'), 
+ 
+            path('metar/', views.metar, name='metar_data'),
+
+
+  
+ 
 ]
