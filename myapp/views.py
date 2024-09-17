@@ -5,24 +5,30 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from .metar import get_metar_data
 
-#laitettu pip install scrapy, pip install django djangorestframework
-
+# Käytä pip:ä asentaaksesi tarvittavat paketit:
+# pip install scrapy
+# pip install django
+# pip install djangorestframework
 
 def index(request):
+    # Tämä näkymä näyttää yksinkertaisen tervehdyksen
     return HttpResponse("Tervetuloa sovelluksen etusivulle!")
 
-#python manage.py runserver
-#http://127.0.0.1:8000/weather
+# Tämä näkymä käsittelee säädatan näyttämistä
+# Pythonin komennolla python manage.py runserver voit käynnistää palvelimen
+# ja käydä näkymässä osoitteessa http://127.0.0.1:8000/weather
 def weather_data_view(request):
+    # Luetaan säädata tiedostosta w.txt
     file_path = os.path.join(settings.BASE_DIR, 'w.txt')
     
+    # Avataan tiedosto lukemista varten
     with open(file_path, 'r') as file:
         data = file.read()
 
-    # Datan jako palasiksi
+    # Jaetaan luettu data riveihin
     lines = data.split('\n')
 
-    # Tehdään termit ja muuttujattt
+    # Luodaan sanakirja säädatan säilyttämiseksi
     weather_data = {
         'one_hour_rainfall': [],
         'twenty_four_hour_rainfall': [],
@@ -34,7 +40,7 @@ def weather_data_view(request):
         'max_wind_speed': []
     }
 
-    # Käydään jaetut osat läpi ja lisätään ne muuttujiin
+    # Käydään jokainen rivi läpi ja lisätään tiedot oikeisiin kenttiin sanakirjassa
     for line in lines:
         if 'One Hour' in line:
             weather_data['one_hour_rainfall'].append(line.split(': ')[1])
@@ -53,27 +59,33 @@ def weather_data_view(request):
         elif 'Max Wind Speed (Five Minutes)' in line:
             weather_data['max_wind_speed'].append(line.split(': ')[1])
 
+    # Tarkistetaan, onko käyttäjä pyytänyt JSON-muotoista dataa
     response_format = request.GET.get('muoto', 'html')
     
     if response_format == 'json':
+        # Palautetaan säädata JSON-muodossa
         return JsonResponse(weather_data)
     else:
-        # Renderöidään weather.html tiedosto
+        # Renderöidään HTML-sivusto säädatalle
         return render(request, 'weather.html', {'weather_data': weather_data})
 
 @api_view(['GET'])
 def metar(request):
+    # Haetaan METAR-tiedot ulkoisesta lähteestä
     data = get_metar_data()
+    
+    # Tarkistetaan, onko käyttäjä pyytänyt JSON-muotoista dataa
     response_format = request.GET.get('muoto', 'html')
     
     if response_format == 'json':
+        # Palautetaan METAR-data JSON-muodossa
         return JsonResponse(data)
     else:
+        # Renderöidään HTML-sivusto METAR-datalle
         metar_data = data['data'][0]
-        # Renderöidään metar.html tiedosto
         return render(request, 'metar.html', {'metar_data': metar_data})
     
-    #http://127.0.0.1:8000/metar/
-    #http://127.0.0.1:8000/metar/?muoto=html
-    #http://127.0.0.1:8000/metar/?muoto=json¨
-    
+    # Näkymä on käytettävissä seuraavilla URL-osoitteilla:
+    # http://127.0.0.1:8000/metar/
+    # http://127.0.0.1:8000/metar/?muoto=html
+    # http://127.0.0.1:8000/metar/?muoto=json
