@@ -15,15 +15,30 @@ def index(request):
     # Tämä näkymä näyttää yksinkertaisen tervehdyksen
     return HttpResponse("Tervetuloa sovelluksen etusivulle!")
 
+# Helper function to get the latest file in a directory
+def get_latest_file(directory):
+    files = [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    if not files:
+        return None
+    latest_file = max(files, key=os.path.getmtime)
+    return latest_file
+
+
 # Tämä näkymä käsittelee säädatan näyttämistä
 # Pythonin komennolla python manage.py runserver voit käynnistää palvelimen
 # ja käydä näkymässä osoitteessa http://127.0.0.1:8000/weather
 def weather_data_view(request):
-    # Luetaan säädata tiedostosta w.txt
-    file_path = os.path.join(settings.BASE_DIR, 'w.txt',)
+    # Luetaan säädata kansiosta test
+    test_folder = os.path.join(settings.BASE_DIR, 'test')
+
+    # Get the latest file from the 'test' folder
+    latest_file = get_latest_file(test_folder)
+
+    if latest_file is None:
+        return HttpResponse("No files found in the test folder.", status=404)
     
-    # Avataan tiedosto lukemista varten
-    with open(file_path, 'r') as file:
+    # Avataan uusin tiedosto lukemista varten
+    with open(latest_file, 'r') as file:
         data = file.read()
 
     # Jaetaan luettu data riveihin

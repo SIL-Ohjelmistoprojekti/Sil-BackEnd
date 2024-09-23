@@ -1,0 +1,60 @@
+Wind Direction: 315
+
+Average Wind Speed (One Minute): 0.00m/s
+
+Max Wind Speed (Five Minutes): 0.89m/s
+
+Rain Fall (One Hour): 0.00mm
+
+Rain Fall (24 Hour): 0.00mm
+
+Temperature: 21.67C
+
+Humidity: 58%
+
+Barometric Pressure: 1014.50hPa
+
+
+
+
+
+Wind Direction: 270
+
+Average Wind Speed (One Minute): 0.00m/s
+
+Max Wind Speed (Five Minutes): 0.89m/s
+
+Rain Fall (One Hour): 0.00mm
+
+Rain Fall (24 Hour): 0.00mm
+
+Temperature: 21.67C
+
+Humidity: 58%
+
+Barometric Pressure: 1014.50hPa
+
+
+
+
+
+Wind Direction: 270
+
+Average Wind Speed (One Minute): 0.00m/s
+
+Max Wind Speed (Five Minutes): 0.89m/s
+
+Rain Fall (One Hour): 0.00mm
+
+Rain Fall (24 Hour): 0.00mm
+
+Temperature: 21.67C
+
+Humidity: 58%
+
+Barometric Pressure: 1014.50hPa
+
+
+
+
+
