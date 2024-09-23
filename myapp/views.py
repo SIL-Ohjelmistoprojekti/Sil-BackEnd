@@ -9,6 +9,7 @@ from .metar import get_metar_data
 # pip install scrapy
 # pip install django
 # pip install djangorestframework
+# pip install requests
 
 def index(request):
     # Tämä näkymä näyttää yksinkertaisen tervehdyksen

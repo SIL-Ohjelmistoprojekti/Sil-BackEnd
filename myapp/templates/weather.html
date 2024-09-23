@@ -7,7 +7,7 @@
     <h2>Weather Data</h2>
     <ul>
         {% for key, values in weather_data.items %}
-            <li><strong>{{ key|cut:"_"|title }}:</strong></li>  <!-- Removes underscores and capitalizes -->
+            <li><strong>{{ key }}:</strong></li>
             {% for value in values %}
                 <li>{{ value }}</li>
             {% endfor %}
