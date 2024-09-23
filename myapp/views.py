@@ -19,7 +19,7 @@ def index(request):
 # ja käydä näkymässä osoitteessa http://127.0.0.1:8000/weather
 def weather_data_view(request):
     # Luetaan säädata tiedostosta w.txt
-    file_path = os.path.join(settings.BASE_DIR, 'w.txt')
+    file_path = os.path.join(settings.BASE_DIR, 'w.txt',)
     
     # Avataan tiedosto lukemista varten
     with open(file_path, 'r') as file:
