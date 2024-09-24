@@ -96,12 +96,10 @@ def metar(request):
     
     if response_format == 'json':
         # Palautetaan METAR-data JSON-muodossa
-        return JsonResponse(data)
+        return JsonResponse({'data': data})
     else:
         # Renderöidään HTML-sivusto METAR-datalle
-        metar_data = data['data'][0]
-        return render(request, 'metar.html', {'metar_data': metar_data})
-    
+        return render(request, 'metar.html', {'metar_data': data})
     # Näkymä on käytettävissä seuraavilla URL-osoitteilla:
     # http://127.0.0.1:8000/metar/
     # http://127.0.0.1:8000/metar/?muoto=html
