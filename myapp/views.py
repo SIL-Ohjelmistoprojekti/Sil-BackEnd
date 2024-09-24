@@ -10,6 +10,7 @@ from .metar import get_metar_data
 # pip install django
 # pip install djangorestframework
 # pip install requests
+# pip install django-cors-headers
 
 def index(request):
     # Tämä näkymä näyttää yksinkertaisen tervehdyksen
