@@ -53,7 +53,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:4000",
+    "http://127.0.0.1:5173",
 ]
 
 ROOT_URLCONF = 'backend_sil.urls'
