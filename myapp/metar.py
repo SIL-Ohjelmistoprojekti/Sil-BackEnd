@@ -3,27 +3,23 @@ from datetime import datetime
 import math
 
 def calculate_relative_humidity(temperature, dew_point):
-    # Muunna lämpötila ja kastepiste Celsius-asteista Kelvin-asteiksi. Joo tää on COpilot shittii
     temp_k = float(temperature) + 273.15
     dew_point_k = float(dew_point) + 273.15
     
-    # Laske suhteellinen kosteus
     humidity = 100 * (math.exp((17.625 * float(dew_point)) / (243.04 + float(dew_point))) / 
                       math.exp((17.625 * float(temperature)) / (243.04 + float(temperature))))
     
     return round(humidity, 2)
 
 def parse_metar(raw_metar):
-    #  METAR-data
     lines = raw_metar.strip().split('\n')
     
     if not lines or len(lines) < 2:
         raise ValueError("METAR data is not in the expected format")
     
-    latest_metar = lines[-1]  # Viimeisin rivi
+    latest_metar = lines[-1]
     parts = latest_metar.split(' ')
     
-    # Kellonaika ja päivämäärä. HUOM SIVUSTOLLA ON SUOMEN AIKA KUN API KÄYTTÄÄ NORJAN AIKAA.
     timestamp = parts[1]
     day = int(timestamp[:2])
     hour = int(timestamp[2:4])
@@ -31,7 +27,6 @@ def parse_metar(raw_metar):
     observed_time = datetime.utcnow().replace(day=day, hour=hour, minute=minute, second=0, microsecond=0)
     observed_str = observed_time.strftime('%d-%m-%Y %H:%M UTC')
     
-    # Nsoig eli vika kohta ja siihen selitykset
     change_codes = {
         'NOSIG': 'No significant changes expected',
         'BECMG': 'Becoming - Conditions are expected to change gradually',
@@ -46,7 +41,6 @@ def parse_metar(raw_metar):
     change_code = parts[-1] if parts[-1] in change_codes else 'NOSIG'
     change_description = change_codes.get(change_code, 'No significant changes expected')
     
-    # Tsekataan, että lämpötila- ja kastepistearvot on olemassa
     temperature = 'N/A'
     dew_point = 'N/A'
     for part in parts:
@@ -54,24 +48,30 @@ def parse_metar(raw_metar):
             temperature, dew_point = part.split('/')
             break
     
-    # Lasketaan  (ilman) kosteus
     humidity = 'N/A'
     if temperature != 'N/A' and dew_point != 'N/A':
         humidity = calculate_relative_humidity(temperature, dew_point)
     
-    #  ilmanpaine kässittely (barometer)
     barometer = 'N/A'
     for part in parts:
         if part.startswith('Q'):
             barometer = part[1:]
             break
     
-    #  pilvikorkeus lasku (ceiling)
     ceiling = 'N/A'
     for part in parts:
         if part.startswith('FEW') or part.startswith('SCT') or part.startswith('BKN') or part.startswith('OVC'):
-            ceiling = int(part[3:]) * 100  # Muunna jalat metreiksi
+            ceiling = int(part[3:]) * 100
             break
+    
+    wind_direction = parts[2][:3]
+    wind_speed = parts[2][3:5]
+    wind_variety = parts[3]
+    
+    visibility = parts[4]
+    visibility_text = f"{visibility} meters"
+    if int(visibility) >= 9999:
+        visibility_text += " (over 10 km)"
     
     data = {
         'station': {'name': parts[0]},
@@ -79,9 +79,12 @@ def parse_metar(raw_metar):
         'temperature': {'celsius': temperature},
         'dew_point': {'celsius': dew_point},
         'humidity': {'percent': humidity},
-        'wind': {'speed_kph': parts[2]},
-        'variety': parts[3],
-        'visibility': {'meters': parts[4]},
+        'wind': {
+            'direction': wind_direction,
+            'speed_kph': round(float(wind_speed) * 1.852, 2),
+            'variety': wind_variety
+        },
+        'visibility': {'text': visibility_text},
         'barometer': {'hpa': barometer},
         'ceiling': {'feet': ceiling},
         'observed': observed_str,

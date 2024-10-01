@@ -11,9 +11,9 @@
     <p>Temperature: {{ metar_data.temperature.celsius }}°C</p>
     <p>Dew Point: {{ metar_data.dew_point.celsius }}°C</p>
     <p>Humidity: {{ metar_data.humidity.percent }}% (Calculated from Dew Point & Temperature) </p>
-    <p>Wind: {{ metar_data.wind.speed_kph }} kph</p>
-    <p>Visibility: {{ metar_data.visibility.meters }} meters</p>
-    <p>Clouds: {{ metar_data.clouds.0.text }} at {{ metar_data.clouds.0.base_feet_agl }} feet</p>
+    <p>Wind Speed: {{ metar_data.wind.speed_kph }} kph</p>
+    <p>Visibility: {{ metar_data.visibility.text }}</p>
+    <p>Clouds: few clouds at {{ metar_data.ceiling.feet }} feet</p>
     <p>Barometer: {{ metar_data.barometer.hpa }} hPa</p>
     <p>Ceiling: {{ metar_data.ceiling.feet }} feet</p>
     <p>Observed: {{ metar_data.observed }}</p>
