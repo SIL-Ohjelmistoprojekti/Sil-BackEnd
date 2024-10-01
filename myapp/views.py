@@ -6,12 +6,12 @@ from rest_framework.decorators import api_view
 from .metar import get_metar_data
 
 # Käytä pip:ä asentaaksesi tarvittavat paketit:
-# pip install scrapy
+
 # pip install django
 # pip install djangorestframework
 # pip install requests
 # pip install django-cors-headers
-
+# python manage.py runserver
 def index(request):
     # Tämä näkymä näyttää yksinkertaisen tervehdyksen
     return HttpResponse("Tervetuloa sovelluksen etusivulle!")
