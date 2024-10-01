@@ -9,13 +9,14 @@
     <h1>METAR Data for {{ metar_data.station.name }}</h1>
     <p>Raw METAR: {{ metar_data.raw_text }}</p>
     <p>Temperature: {{ metar_data.temperature.celsius }}°C</p>
+    <p>Humidity: {{ metar_data.humidity.percent }}%</p>
     <p>Wind: {{ metar_data.wind.speed_kph }} kph</p>
-    <p>Wind variety: {{ metar_data.variety }} kph</p>
-
     <p>Visibility: {{ metar_data.visibility.meters }} meters</p>
     <p>Clouds: {{ metar_data.clouds.0.text }} at {{ metar_data.clouds.0.base_feet_agl }} feet</p>
     <p>Barometer: {{ metar_data.barometer.hpa }} hPa</p>
+    <p>Ceiling: {{ metar_data.ceiling.feet }} feet</p>
     <p>Observed: {{ metar_data.observed }}</p>
+    <p>Upcoming changes: {{ metar_data.change_code }} - {{ metar_data.change_description }}</p>
 </body>
 
 </html>
