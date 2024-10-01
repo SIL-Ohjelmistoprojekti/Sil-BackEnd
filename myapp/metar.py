@@ -1,6 +1,8 @@
 import requests
 from datetime import datetime
 import math
+#pip install psycopg2. TÄMÄ ON VIELÄ TESTI VAIHEESSA.
+# import psycopg2
 
 def calculate_relative_humidity(temperature, dew_point):
     temp_k = float(temperature) + 273.15
@@ -103,3 +105,58 @@ def get_metar_data():
         return parse_metar(raw_metar)
     else:
         return {"error": "Failed to retrieve data", "status_code": response.status_code}
+
+
+    #POstgre testi
+    """
+def save_to_file(data, filename):
+    with open(filename, 'w') as file:
+        file.write(str(data))
+
+def save_to_postgresql(data):
+    try:
+        connection = psycopg2.connect(
+            dbname="dbname",
+            user="käyttis",
+            password="passu",
+            host="hostti",
+            port="portti"
+        )
+        cursor = connection.cursor()
+        
+        insert_query = 
+       INSERT INTO metar_data (station, raw_text, temperature, dew_point, humidity, wind_direction, wind_speed, wind_variety, visibility, barometer, ceiling, observed, change_code, change_description)
+       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+     
+        
+        cursor.execute(insert_query, (
+            data['station']['name'],
+            data['raw_text'],
+            data['temperature']['celsius'],
+            data['dew_point']['celsius'],
+            data['humidity']['percent'],
+            data['wind']['direction'],
+            data['wind']['speed_kph'],
+            data['wind']['variety'],
+            data['visibility']['text'],
+            data['barometer']['hpa'],
+            data['ceiling']['feet'],
+            data['observed'],
+            data['change_code'],
+            data['change_description']
+        ))
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+    except Exception as error:
+        print(f"Error saving to PostgreSQL: {error}")
+
+if __name__ == "__main__":
+    metar_data = get_metar_data()
+    if "error" not in metar_data:
+        save_to_file(metar_data, 'metar_data.txt')
+        save_to_postgresql(metar_data)
+    else:
+        print(metar_data)
+"""
