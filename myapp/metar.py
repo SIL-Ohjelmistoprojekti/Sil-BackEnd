@@ -1,9 +1,9 @@
 import requests
 from datetime import datetime
 import math
-#pip install psycopg2. TÄMÄ ON VIELÄ TESTI VAIHEESSA.
-# import psycopg2
+import re
 
+# Funktio suhteellisen kosteuden laskemiseen
 def calculate_relative_humidity(temperature, dew_point):
     temp_k = float(temperature) + 273.15
     dew_point_k = float(dew_point) + 273.15
@@ -13,6 +13,7 @@ def calculate_relative_humidity(temperature, dew_point):
     
     return round(humidity, 2)
 
+# METAR-datan parsiminen
 def parse_metar(raw_metar):
     lines = raw_metar.strip().split('\n')
     
@@ -22,6 +23,7 @@ def parse_metar(raw_metar):
     latest_metar = lines[-1]
     parts = latest_metar.split(' ')
     
+    # Aika
     timestamp = parts[1]
     day = int(timestamp[:2])
     hour = int(timestamp[2:4])
@@ -29,6 +31,7 @@ def parse_metar(raw_metar):
     observed_time = datetime.utcnow().replace(day=day, hour=hour, minute=minute, second=0, microsecond=0)
     observed_str = observed_time.strftime('%d-%m-%Y %H:%M UTC')
     
+    # Muutoksen koodit
     change_codes = {
         'NOSIG': 'No significant changes expected',
         'BECMG': 'Becoming - Conditions are expected to change gradually',
@@ -43,6 +46,7 @@ def parse_metar(raw_metar):
     change_code = parts[-1] if parts[-1] in change_codes else 'NOSIG'
     change_description = change_codes.get(change_code, 'No significant changes expected')
     
+    # Lämpötila ja kastepiste
     temperature = 'N/A'
     dew_point = 'N/A'
     for part in parts:
@@ -54,27 +58,38 @@ def parse_metar(raw_metar):
     if temperature != 'N/A' and dew_point != 'N/A':
         humidity = calculate_relative_humidity(temperature, dew_point)
     
+    # Barometri (QNH)
     barometer = 'N/A'
     for part in parts:
         if part.startswith('Q'):
             barometer = part[1:]
             break
     
+    # Pilvien kattavuus (ceiling)
+    cloud_cover = []
     ceiling = 'N/A'
     for part in parts:
-        if part.startswith('FEW') or part.startswith('SCT') or part.startswith('BKN') or part.startswith('OVC'):
-            ceiling = int(part[3:]) * 100
-            break
+        if part.startswith(('FEW', 'SCT', 'BKN', 'OVC')):
+            try:
+                cloud_altitude = int(part[3:6]) * 100  # Ota numerot pilvikoodista
+                cloud_cover.append(part)  # Lisää kaikki pilvien kattavuudet listaan
+                if part.startswith('BKN') or part.startswith('OVC'):
+                    ceiling = cloud_altitude  # Kattavuus "ceiling" tarkoittaa BKN/OVC kerrosta
+            except ValueError:
+                ceiling = 'N/A'
     
+    # Tuuli
     wind_direction = parts[2][:3]
     wind_speed = parts[2][3:5]
-    wind_variety = parts[3]
+    wind_unit = parts[2][-2:]  # Yksikkö (esim. KT)
     
-    visibility = parts[4]
+    # Näkyvyys
+    visibility = parts[3]
     visibility_text = f"{visibility} meters"
-    if int(visibility) >= 9999:
-        visibility_text += " (over 10 km)"
+    if visibility.isdigit() and int(visibility) >= 9999:
+        visibility_text = "10 km or more"
     
+    # Palautettava data sanakirjassa
     data = {
         'station': {'name': parts[0]},
         'raw_text': latest_metar,
@@ -84,11 +99,12 @@ def parse_metar(raw_metar):
         'wind': {
             'direction': wind_direction,
             'speed_kph': round(float(wind_speed) * 1.852, 2),
-            'variety': wind_variety
+            'unit': wind_unit
         },
         'visibility': {'text': visibility_text},
         'barometer': {'hpa': barometer},
         'ceiling': {'feet': ceiling},
+        'cloud_cover': cloud_cover,
         'observed': observed_str,
         'change_code': change_code,
         'change_description': change_description
@@ -96,6 +112,7 @@ def parse_metar(raw_metar):
     
     return data
 
+# Funktio METAR-datan hakemiseen
 def get_metar_data():
     url = "https://api.met.no/weatherapi/tafmetar/1.0/metar.txt?icao=EFHK"
 
@@ -107,8 +124,8 @@ def get_metar_data():
         return {"error": "Failed to retrieve data", "status_code": response.status_code}
 
 
-    #POstgre testi
-    """
+# PostgreSQL-tallennus testivaiheessa
+"""
 def save_to_file(data, filename):
     with open(filename, 'w') as file:
         file.write(str(data))
@@ -128,7 +145,6 @@ def save_to_postgresql(data):
        INSERT INTO metar_data (station, raw_text, temperature, dew_point, humidity, wind_direction, wind_speed, wind_variety, visibility, barometer, ceiling, observed, change_code, change_description)
        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
      
-        
         cursor.execute(insert_query, (
             data['station']['name'],
             data['raw_text'],
@@ -151,6 +167,7 @@ def save_to_postgresql(data):
         connection.close()
     except Exception as error:
         print(f"Error saving to PostgreSQL: {error}")
+"""
 
 if __name__ == "__main__":
     metar_data = get_metar_data()
@@ -159,4 +176,3 @@ if __name__ == "__main__":
         save_to_postgresql(metar_data)
     else:
         print(metar_data)
-"""
