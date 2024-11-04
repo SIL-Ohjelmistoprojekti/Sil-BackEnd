@@ -28,9 +28,7 @@ To install **SIL**, follow these steps:
 1. Clone the repository:
 ``` 
 git clone https://github.com/SIL-Ohjelmistoprojekti/Sil-BackEnd
-          https://github.com/SIL-Ohjelmistoprojekti/Sil-FrontEnd
-          https://github.com/SIL-Ohjelmistoprojekti/Linux_serveri_BackEnd
-          https://github.com/SIL-Ohjelmistoprojekti/Tailwind_FrontEnd
+
 ```
 
 2. Install the necessary dependencies:
@@ -53,49 +51,80 @@ pip install django-cors-headers
 ## Usage
 Here’s a quick guide on how to use **SIL:**
 
-Run the application:
+1. Run the application:
 ```
 python manage.py runserver
 ``` 
 
-(Add additional usage examples, command-line arguments, or configuration details here if needed.)
+By default, this runs the server on ```http://127.0.0.1:8000```.
+
+2. Access the weather data:
++ METAR data: ```http://127.0.0.1:8000/metar/```
++ Weather data (from files): ```http://127.0.0.1:8000/weather/``` 
+
+3. Response Formats: You can request data in both HTML or JSON format by using the ```?muoto=``` query parameter:
+
++ HTML: ```?muoto=html``` (default)
++ JSON: ```?muoto=json```
+
 
 ## API Documentation
 The following section provides a reference to the API exposed by **SIL**.
 
-Example API Endpoints:
+Endpoints:
 
-+ Get current weather data for an airport:
+1. Get current weather data from the test folder:
 ```
-GET /api/weather/{airport_code}
+GET /weather/
 ```
-Response:
+This endpoint retrieves weather data from the most recent file in the ```test``` folder. The response can be in HTML or JSON format.
+
+Example JSON:
 
 ``` 
 {
-  "temperature": "15°C",
-  "wind_speed": "12 knots",
-  "visibility": "10 km",
-  "precipitation": "None",
-  "alerts": []
+    "one_hour_rainfall": ["0.0 mm"],
+    "twenty_four_hour_rainfall": ["2.5 mm"],
+    "temperature": ["12°C"],
+    "humidity": ["78%"],
+    "barometric_pressure": ["1013 hPa"],
+    "wind_direction": ["270°"],
+    "average_wind_speed": ["10 km/h"],
+    "max_wind_speed": ["15 km/h"]
+}
+
+```
+
+2. Get METAR data for a specific airport
+
+``` 
+GET /metar/
+``` 
+This endpoint fetches METAR (Meteorological Aerodrome Report) data from an external source. You can request the data in either HTML or JSON format by using the ```?muoto=``` query parameter.
+
+Example (JSON):
+
+```
+{
+    "station": {"name": "EFHK"},
+    "raw_text": "METAR EFHK 121350Z 27005KT 9999 FEW030 07/03 Q1021 NOSIG",
+    "temperature": {"celsius": "7"},
+    "dew_point": {"celsius": "3"},
+    "humidity": {"percent": 80.0},
+    "wind": {
+        "direction": "270",
+        "speed_kph": 9.26,
+        "unit": "KT"
+    },
+    "visibility": {"text": "10 km or more"},
+    "barometer": {"hpa": "1021"},
+    "ceiling": {"feet": 3000},
+    "cloud_cover": ["FEW030"],
+    "observed": "12-11-2023 13:50 UTC",
+    "change_code": "NOSIG",
+    "change_description": "No significant changes expected"
 }
 ```
-+ Get weather forecast for a flight route:
-Response
-
-```
-    weather_data = {
-        'one_hour_rainfall': [],
-        'twenty_four_hour_rainfall': [],
-        'temperature': [],
-        'humidity': [],
-        'barometric_pressure': [],
-        'wind_direction': [],
-        'average_wind_speed': [],
-        'max_wind_speed': []
-    }
-```
-
 
 ## Contributing
 We welcome contributions to **SIL**! Follow these steps to contribute:
